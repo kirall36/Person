@@ -53,10 +53,12 @@ public class PersonStorage {
 
     /**
      * Функция для удаления пользователя по уникальному идентификатору
+     * Ghjdthjdkf
      * @param id - уникальный идентификатор
      */
     public void deletePerson(int id)
     {
+        if(last_id % 10 == 0) reduce();
         Person[] new_people =  new Person[people.length];
         last_id--;
 
@@ -98,11 +100,21 @@ public class PersonStorage {
     /**
      * Функция для увеличения размера коллекции на 10
      */
-    private void expand() {
+    private void expand()
+    {
         Person[] new_people = new Person[people.length + 10];
 
         for(int i = 0; i < people.length; i++)
              new_people[i] = people[i];
+        people = new_people;
+    }
+
+    private void reduce()
+    {
+        Person[] new_people = new Person[people.length - 10];
+
+        for(int i = 0; i < people.length-10; i++)
+            new_people[i] = people[i];
         people = new_people;
     }
 }
