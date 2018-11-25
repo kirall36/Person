@@ -1,3 +1,7 @@
+package PersonStorage;
+
+import Person.Person;
+import PersonChecker.PersonChecker;
 import org.joda.time.LocalDate;
 
 /**
@@ -12,7 +16,7 @@ import org.joda.time.LocalDate;
 public class PersonStorage {
 
     /** Поле массив людей*/
-    private Person[] people;
+    public Person[] people;
     /** Поле последний уникальный идентификатор
      * Необходимо для добавления, удаления и выборки людей*/
     private int last_id;
@@ -46,7 +50,7 @@ public class PersonStorage {
     {
         if(last_id == people.length) expand();
         people[last_id] = new Person(last_id, fio, sex, date_of_birth);
-        System.out.printf("Added new Person ");
+        System.out.printf("Added new Person.Person ");
         people[last_id].showInfo();
         last_id++;
     }
@@ -97,6 +101,17 @@ public class PersonStorage {
         }
     }
 
+    public void searchPersons(PersonChecker pc, Object value)
+    {
+        for(int i = 0; i < last_id; i++)
+        {
+            if(pc.check(people[i], value))
+            {
+                people[i].showInfo();
+            }
+        }
+    }
+
     /**
      * Функция для увеличения размера коллекции на 10
      */
@@ -109,6 +124,9 @@ public class PersonStorage {
         people = new_people;
     }
 
+    /**
+     * Функция для уменьшения размера коллекции на 10
+     */
     private void reduce()
     {
         Person[] new_people = new Person[people.length - 10];
