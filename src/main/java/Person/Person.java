@@ -53,6 +53,12 @@ public class Person {
     }
 
     /**
+     * Функция для изменения значения поля {@link Person#id} на новое значение new_id
+     * @param new_id - новое значение
+     */
+    public void changeId(int new_id) {id = new_id;}
+
+    /**
      * Функция для получения значения поля {@link Person#fio}
      * @return возвращает ФИО
      */
