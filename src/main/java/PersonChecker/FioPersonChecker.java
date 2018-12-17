@@ -1,7 +1,7 @@
-package FioPersonChecker;
+package PersonChecker;
 
 import Person.Person;
-import PersonChecker.PersonChecker;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Кирилл on 25.11.2018.
@@ -11,6 +11,8 @@ import PersonChecker.PersonChecker;
  * @author Кирилл
  */
 public class FioPersonChecker implements PersonChecker {
+    /**Поле Логера*/
+    private static final Logger log = Logger.getLogger(FioPersonChecker.class);
 
     /***
      * Функция для проверки соответсвия поля объекта человека и переданного значения
@@ -20,6 +22,7 @@ public class FioPersonChecker implements PersonChecker {
      */
     public boolean check(Person p, Object Fio)
     {
+        log.info("check Person " + p.getFio() + " with " + Fio.toString());
         return p.getFio().equals(Fio);
     }
 }

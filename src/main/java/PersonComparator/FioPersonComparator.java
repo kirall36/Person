@@ -1,7 +1,7 @@
-package FioPersonComparator;
+package PersonComparator;
 
 import Person.Person;
-import PersonComparator.PersonComparator;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Кирилл on 25.11.2018.
@@ -11,6 +11,8 @@ import PersonComparator.PersonComparator;
  * @author Кирилл
  */
 public class FioPersonComparator implements PersonComparator{
+    /**Поле Логера*/
+    private static final Logger log = Logger.getLogger(FioPersonComparator.class);
 
     /***
      * Функция для проверки величины Фио двух людей
@@ -20,6 +22,7 @@ public class FioPersonComparator implements PersonComparator{
      */
     public int compare(Person p1, Person p2)
     {
+        log.debug("compare Person1: " + p1.getFio() + " with Person2:" + p2.getFio() + " by Fio");
         return p1.getFio().compareTo(p2.getFio());
     }
 }

@@ -1,14 +1,19 @@
 package PersonStorage;
 
+import Inject.Inject;
 import Person.Person;
+import Inject.Injector;
 import PersonChecker.PersonChecker;
 import PersonComparator.PersonComparator;
-import org.joda.time.LocalDate;
+import Sorter.Sorter;
+import org.apache.log4j.Logger;
+
+import java.util.Comparator;
 
 /**
  * Created by Кирилл on 11.11.2018.
- * Переделать addPerson - должен принимать экземпляр Person
- * Создать интерфейс Sorter с методом sort, его реализовать в трех классах для определенного типа сортировки.
+ * + Переделать addPerson - должен принимать экземпляр Person
+ * + Создать интерфейс Sorter с методом sort, его реализовать в трех классах для определенного типа сортировки.
  * Убрать все System.out.print(), где это не нужно
  */
 
@@ -21,6 +26,14 @@ public class PersonStorage {
 
     /** Поле массив людей*/
     public Person[] people;
+
+    /**Поле сортера*/
+    @Inject
+    private Sorter sorter = null;
+
+    /**Поле Логера*/
+    private static final Logger log = Logger.getLogger(PersonStorage.class);
+
     /** Поле последний уникальный идентификатор
      * Необходимо для добавления, удаления и выборки людей*/
     private int last_id;
@@ -30,8 +43,10 @@ public class PersonStorage {
      */
     public PersonStorage()
     {
+        log.info("init Storage");
         people = new Person[10];
         last_id = 0;
+        new Injector().dosomething(this);
     }
 
     /**
@@ -40,6 +55,7 @@ public class PersonStorage {
      */
     public int length()
     {
+        log.info("get Srorage's length");
         return last_id;
     }
 
@@ -50,22 +66,22 @@ public class PersonStorage {
      * @param sex - Пол
      * @param date_of_birth - Дата рождения
      */
-    public void addPerson(String fio, char sex, LocalDate date_of_birth)
+    public void addPerson(Person person)
     {
+        log.info("add new Person" + person.getId() + " " + person.getFio() + " " + person.getSex() + " " + person.getDate_of_birth() + " " + "in Storage");
         if(last_id == people.length) expand();
-        people[last_id] = new Person(last_id, fio, sex, date_of_birth);
-        System.out.printf("Added new Person.Person ");
-        people[last_id].showInfo();
+        person.setId(last_id);
+        people[last_id] = person;
         last_id++;
     }
 
     /**
      * Функция для удаления пользователя по уникальному идентификатору
-     * Ghjdthjdkf
      * @param id - уникальный идентификатор
      */
     public void deletePerson(int id)
     {
+        log.info("delete a Person" + id + people[id].getFio() + " " + people[id].getSex() + " " + people[id].getDate_of_birth() + " " + "from Storage");
         if(last_id % 10 == 0) reduce();
         Person[] new_people =  new Person[people.length];
         last_id--;
@@ -84,13 +100,13 @@ public class PersonStorage {
     }
 
     /**
-     * Функция для вывода информации об определенном человеке по уникальному идентификатору
-     * Вызывает {@link Person#showInfo()}
+     * Функция для получения определенного человеке по уникальному идентификатору
      * @param id - уникальный идентификатор
      */
-    public void showPerson(int id)
+    public Person get(int id)
     {
-        people[id].showInfo();
+        log.info("get Person with id " + id);
+        return people[id];
     }
 
     /**
@@ -99,6 +115,7 @@ public class PersonStorage {
      */
     public void showAllPersons()
     {
+        log.info("show all persons");
         for(int i = 0; i < last_id; i++)
         {
            people[i].showInfo();
@@ -110,6 +127,7 @@ public class PersonStorage {
      */
     public void changeIds()
     {
+        log.info("changing ids in Storage");
         for(int j = 0; j < length(); j++)
         {
             people[j].changeId(j);
@@ -121,90 +139,48 @@ public class PersonStorage {
      * @param pc - экземпляр чекера, по которому будет весьтись поиск
      * @param value - значения для сравнения
      */
-    public void searchPersons(PersonChecker pc, Object value)
+    public PersonStorage searchPersons(PersonChecker pc, Object value)
     {
+        log.debug("search Persons by " + pc.toString() + " and " + value.toString());
         boolean found = false;
+        PersonStorage searchedpeople = new PersonStorage();
         for(int i = 0; i < last_id; i++)
         {
             if(pc.check(people[i], value))
             {
-                people[i].showInfo();
+                searchedpeople.addPerson(people[i]);
                 found = true;
             }
         }
-        if(!found) System.out.println("Not found!");
+        if(!found) System.out.println("Not found!"); //!!!Переделать
+        return searchedpeople;
     }
 
     /**
-     * Функция пузырьковой сортировки
-     * @param pc - компоратор, в соответсвии с которым происходит сортировка
+     * Функция-сеттер для сортера
+     * @param sorter
      */
-    public void bubbleSort(PersonComparator pc) {
-        int i = 0;
-        int goodPairsCounter = 0;
-        while (true) {
-            if (pc.compare(people[i], people[i + 1]) >= 1) {
-                Person q = people[i];
-                people[i] = people[i + 1];
-                people[i + 1] = q;
-                goodPairsCounter = 0;
-            } else {
-                goodPairsCounter++;
-            }
-            i++;
-            if (i == length() - 1) {
-                i = 0;
-            }
-            if (goodPairsCounter == length() - 1) break;
-        }
-        changeIds();
-        System.out.println("Array after the sort:");
-        showAllPersons();
+    public void setSorter(Sorter sorter) {
+        log.info("set sorter to " + sorter.toString());
+        this.sorter = sorter;
     }
 
     /**
-     * Функция сортировки вставками
-     * @param pc - компоратор, в соответсвии с которым происходит сортировка
+     * Функция, возвращающая сортер
+     * @return sorter
      */
-    public void insertSort(PersonComparator pc) {
-        Person temp;
-        int j;
-        for(int i = 0; i < length() - 1; i++){
-            if ( pc.compare(people[i], people[i + 1]) >=1) {
-                temp = people[i + 1];
-                people[i + 1] = people[i];
-                j = i;
-                while (j > 0 && pc.compare(temp, people[j - 1]) <=-1) {
-                    people[j] = people[j - 1];
-                    j--;
-                }
-                people[j] = temp;
-            }
-        }
-        changeIds();
-        System.out.println("Array after the sort:");
-        showAllPersons();
+    public Sorter getSorter() {
+        log.info("get sorter");
+        return this.sorter;
     }
 
     /**
-     * Функция сортировки Шелла
-     * @param pc - компоратор, в соответсвии с которым происходит сортировка
+     * Функция, выполняющая сортировку
+     * @param comparator
      */
-    public void shellSort(PersonComparator pc){
-        int j;
-        for( int gap = length() / 2; gap > 0; gap /= 2 ){
-            for(int i=gap;i< length();i++){
-                Person temp = people[i];
-                for (j = i; j >= gap && pc.compare(people[j - gap], temp) >= 1; j -= gap)
-                {
-                    people[j] = people[j - gap];
-                }
-                people[j] = temp;
-            }
-        }
-        changeIds();
-        System.out.println("Array after the sort:");
-        showAllPersons();
+    public void sort(PersonComparator pc) {
+        log.info("sort Repository  with " + this.sorter.toString() + " by " + pc.toString());
+        sorter.sort(pc, this);
     }
 
     /**
@@ -212,6 +188,7 @@ public class PersonStorage {
      */
     private void expand()
     {
+        log.info("expand Storage by 10");
         Person[] new_people = new Person[people.length + 10];
 
         for(int i = 0; i < people.length; i++)
@@ -224,6 +201,7 @@ public class PersonStorage {
      */
     private void reduce()
     {
+        log.info("reduce Storage by 10");
         Person[] new_people = new Person[people.length - 10];
 
         for(int i = 0; i < people.length-10; i++)

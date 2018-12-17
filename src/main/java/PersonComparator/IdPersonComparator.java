@@ -1,7 +1,7 @@
-package IdPersonComporator;
+package PersonComparator;
 
 import Person.Person;
-import PersonComparator.PersonComparator;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Кирилл on 25.11.2018.
@@ -11,6 +11,8 @@ import PersonComparator.PersonComparator;
  * @author Кирилл
  */
 public class IdPersonComparator implements PersonComparator {
+    /**Поле Логера*/
+    private static final Logger log = Logger.getLogger(IdPersonComparator.class);
 
     /***
      * Функция для проверки величины id двух людей
@@ -20,6 +22,7 @@ public class IdPersonComparator implements PersonComparator {
      */
     public int compare(Person p1, Person p2)
     {
+        log.debug("compare Person1: " + p1.getId() + " with Person2:" + p2.getId() + " by id");
         return new Integer(p1.getId()).compareTo(p2.getId());
     }
 }
